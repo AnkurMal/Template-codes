@@ -3,14 +3,13 @@
 use std::os::raw::*;
 
 /// The style of the macro is:
-/// ```rust
-/// assign_cstring!(id, cstr) or assign_cstring!(id, (format_cstr))
 /// ```
-/// Assigns the string as a cstring, single or in format (2nd argument),
-/// to the unmutable identifier i.e. the variable name (1st argument).
-/// # Arguments
-/// * `id`: The identifier name where the cstring is to be assigned.
-/// * `cstr` or `(format_cstr)`: The string or the format string to be assigned as cstring.
+/// cstring!(cstr) or cstring!(format_cstr)
+/// ```
+/// Returns a string as a cstring.
+/// 
+/// # Argument
+/// The string or the format string to be returned as cstring.
 /// 
 /// # Errors
 /// This will throw an error if the supplied string contain an
@@ -18,17 +17,17 @@ use std::os::raw::*;
 /// 
 /// # Examples
 /// ```
-/// assign_cstring!(text, "hello there!");
-/// assign_cstring!(text, ("format {} arguments", "some"));
+/// let text = cstring!("hello there!");
+/// let text = cstring!("format {} arguments", "some");
 /// ```
 #[macro_export]
-macro_rules! assign_cstring {
-    ($id:ident, ($($cstr:tt)*)) => {
-        let $id = std::ffi::CString::new(format!($($cstr)*)).expect("Failed to create CString.");
-    };
-    ($id:ident, $cstr:expr) => {
-        let $id = std::ffi::CString::new($cstr).expect("Failed to create CString.");
-    }
+macro_rules! cstring {
+    ($cstr:expr) => {{
+        std::ffi::CString::new($cstr).expect("Failed to create CString.")
+    }};
+    ($($cstr:tt)*) => {{
+        std::ffi::CString::new(format!($($cstr)*)).expect("Failed to create CString.")
+    }}
 }
 
 type CstringPtr = *const c_char;
